@@ -67,18 +67,18 @@ concept pack_expands_to_tuple =
     same_as<TupleType, ext::remove_cvref_t<first_of_t<Args...>>>;
 
 template <typename T>
-concept __tuple_type = requires { typename T::__tuple_base_t; };
+concept __is_tuple = requires { typename T::__tuple_base_t; };
 
 // Tuple initialization concepts
 template <typename TupleType, typename... Args>
 concept tuple_full_initializable = 
-    __tuple_type<TupleType> &&
+    __is_tuple<TupleType> &&
     !pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size == sizeof...(Args);
 
 template <typename TupleType, typename... Args>
 concept tuple_partial_initializable = 
-    __tuple_type<TupleType> &&
+    __is_tuple<TupleType> &&
     !pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size > sizeof...(Args);
 
