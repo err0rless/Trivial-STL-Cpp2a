@@ -66,14 +66,19 @@ concept pack_expands_to_tuple =
     sizeof...(Args) == 1 &&
     same_as<TupleType, ext::remove_cvref_t<first_of_t<Args...>>>;
 
+template <typename T>
+concept __tuple_type = requires { typename T::__tuple_base_t; };
+
 // Tuple initialization concepts
 template <typename TupleType, typename... Args>
 concept tuple_full_initializable = 
+    __tuple_type<TupleType> &&
     !pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size == sizeof...(Args);
 
 template <typename TupleType, typename... Args>
 concept tuple_partial_initializable = 
+    __tuple_type<TupleType> &&
     !pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size > sizeof...(Args);
 
@@ -173,10 +178,9 @@ template <typename... Types>
 class tuple {
 private:
   static constexpr std::size_t size = sizeof...(Types);
-
-  using base_t =
+  using __tuple_base_t = 
       detail::tuple_impl<detail::make_idx_seq<sizeof...(Types)>, Types...>;
-  base_t base_;
+  __tuple_base_t base_;
 public:
   explicit tuple(void) : base_() {
     static_assert((... && default_constructible<Types>), 
