@@ -71,15 +71,15 @@ concept __is_tuple = requires { typename T::__tuple_base_t; };
 
 // Tuple initialization concepts
 template <typename TupleType, typename... Args>
-concept tuple_full_initializable = 
+concept initializable_with = 
     __is_tuple<TupleType> &&
-    !pack_expands_to_tuple<TupleType, Args...> &&
+    not pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size == sizeof...(Args);
 
 template <typename TupleType, typename... Args>
-concept tuple_partial_initializable = 
+concept partial_initializable_with = 
     __is_tuple<TupleType> &&
-    !pack_expands_to_tuple<TupleType, Args...> &&
+    not pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size > sizeof...(Args);
 
 // tuple_leaf
@@ -90,21 +90,21 @@ class tuple_leaf {
 public:
   using value_type = T;
   
-  explicit tuple_leaf(void) : data_() {
-    static_assert(!std::is_reference_v<T>, 
-                  "Cannot default construct a reference element.");
-  }
+  explicit constexpr tuple_leaf(void) 
+    requires (not std::is_reference_v<T>)
+    : data_{}
+  { }
 
-  explicit tuple_leaf(detail::tuple_default_construct) : data_() {
-    static_assert(!std::is_reference_v<T>, 
-                  "Cannot default construct a reference element.");
-  }
+  explicit constexpr tuple_leaf(detail::tuple_default_construct)
+    requires (not std::is_reference_v<T>)
+    : data_{} 
+  { }
 
   template <typename _T>
   explicit constexpr tuple_leaf(_T&& element) 
-    requires (!same_as<ext::remove_cvref_t<_T>, tuple_leaf> && 
-              !same_as<_T, detail::tuple_default_construct>)
-    : data_(std::forward<_T>(element))
+    requires (not same_as<ext::remove_cvref_t<_T>, tuple_leaf> && 
+              not same_as<_T, detail::tuple_default_construct>)
+    : data_{std::forward<_T>(element)}
   { }
   
   constexpr tuple_leaf(const tuple_leaf &) = default;
@@ -134,8 +134,8 @@ class tuple_impl<std::index_sequence<Index...>, Types...>
 {
 public:
   // Constructors
-  tuple_impl(void)
-    : tuple_leaf<Index, Types>{ }...
+  explicit constexpr tuple_impl(void)
+    : tuple_leaf<Index, Types>{}...
   { }
 
   template <typename... Args>
@@ -143,12 +143,12 @@ public:
     : tuple_leaf<Index, Types>{ std::forward<Args>(args) }...
   { }
 
-  template <typename... Args, 
-            std::size_t... ArgsIndex, 
-            std::size_t... DefaultIndex>
+  template <std::size_t... ArgsIndex, 
+            std::size_t... DefaultIndex,
+            typename... Args>
   explicit constexpr tuple_impl(idx_seq<ArgsIndex...>, 
-                       idx_seq<DefaultIndex...>, 
-                       Args&&... args)
+                                idx_seq<DefaultIndex...>, 
+                                Args&&... args)
     requires (sizeof...(ArgsIndex) + sizeof...(DefaultIndex) == sizeof...(Types))
     : tuple_leaf<ArgsIndex, ext::access_t<ArgsIndex, Types...>>{ 
         std::forward<Args>(args) }...
@@ -182,14 +182,14 @@ private:
       detail::tuple_impl<detail::make_idx_seq<sizeof...(Types)>, Types...>;
   __tuple_base_t base_;
 public:
-  explicit tuple(void) : base_() {
+  explicit tuple(void) : base_{} {
     static_assert((... && default_constructible<Types>), 
                   "At least one of the Types is not default constructible");
   }
 
   template <typename... Args>
   explicit constexpr tuple(Args&&... args)
-    requires detail::tuple_full_initializable<tuple, Args...>
+    requires detail::initializable_with<tuple, Args...>
     : base_{ std::forward<Args>(args)... }
   { }
 
@@ -197,9 +197,9 @@ public:
             std::size_t n_type = sizeof...(Types),
             std::size_t n_args = sizeof...(Args)>
   explicit constexpr tuple(Args&&... args)
-    requires detail::tuple_partial_initializable<tuple, Args...>
-    : base_{ detail::tuple_range_t<0, n_args - 1>{}, 
-             detail::tuple_range_t<n_args, n_type - 1>{},
+    requires detail::partial_initializable_with<tuple, Args...>
+    : base_{ detail::tuple_range_t<0, n_args - 1>(), 
+             detail::tuple_range_t<n_args, n_type - 1>(),
              std::forward<Args>(args)... }
   { }
   
