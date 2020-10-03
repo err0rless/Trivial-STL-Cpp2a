@@ -1,7 +1,8 @@
 #/bin/sh
 echo "------------------------------ [BUILD] ------------------------------"
+rm -rf build
+mkdir build
 cd build/
-rm -rf ./*
 CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++ cmake ../
 cmake --build .
 
