@@ -85,18 +85,18 @@ class tuple_leaf {
 public:
   using value_type = T;
   
-  tuple_leaf(void) : data_() {
+  explicit tuple_leaf(void) : data_() {
     static_assert(!std::is_reference_v<T>, 
                   "Cannot default construct a reference element.");
   }
 
-  tuple_leaf(detail::tuple_default_construct) : data_() {
+  explicit tuple_leaf(detail::tuple_default_construct) : data_() {
     static_assert(!std::is_reference_v<T>, 
                   "Cannot default construct a reference element.");
   }
 
   template <typename _T>
-  constexpr tuple_leaf(_T&& element) 
+  explicit constexpr tuple_leaf(_T&& element) 
     requires (!same_as<ext::remove_cvref_t<_T>, tuple_leaf> && 
               !same_as<_T, detail::tuple_default_construct>)
     : data_(std::forward<_T>(element))
@@ -134,14 +134,14 @@ public:
   { }
 
   template <typename... Args>
-  constexpr tuple_impl(Args&&... args) noexcept
+  explicit constexpr tuple_impl(Args&&... args) noexcept
     : tuple_leaf<Index, Types>{ std::forward<Args>(args) }...
   { }
 
   template <typename... Args, 
             std::size_t... ArgsIndex, 
             std::size_t... DefaultIndex>
-  constexpr tuple_impl(idx_seq<ArgsIndex...>, 
+  explicit constexpr tuple_impl(idx_seq<ArgsIndex...>, 
                        idx_seq<DefaultIndex...>, 
                        Args&&... args)
     requires (sizeof...(ArgsIndex) + sizeof...(DefaultIndex) == sizeof...(Types))
@@ -178,13 +178,13 @@ private:
       detail::tuple_impl<detail::make_idx_seq<sizeof...(Types)>, Types...>;
   base_t base_;
 public:
-  tuple(void) : base_() {
+  explicit tuple(void) : base_() {
     static_assert((... && default_constructible<Types>), 
                   "At least one of the Types is not default constructible");
   }
 
   template <typename... Args>
-  constexpr tuple(Args&&... args)
+  explicit constexpr tuple(Args&&... args)
     requires detail::tuple_full_initializable<tuple, Args...>
     : base_{ std::forward<Args>(args)... }
   { }
@@ -192,7 +192,7 @@ public:
   template <typename... Args, 
             std::size_t n_type = sizeof...(Types),
             std::size_t n_args = sizeof...(Args)>
-  constexpr tuple(Args&&... args)
+  explicit constexpr tuple(Args&&... args)
     requires detail::tuple_partial_initializable<tuple, Args...>
     : base_{ detail::tuple_range_t<0, n_args - 1>{}, 
              detail::tuple_range_t<n_args, n_type - 1>{},
