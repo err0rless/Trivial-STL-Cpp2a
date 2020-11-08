@@ -54,11 +54,9 @@ struct tuple_range_seq {
 template <std::size_t Begin, std::size_t End>
 using tuple_range_t = typename tuple_range_seq<Begin, End>::type;
 
-// Type pack
-template <typename... Types>
-struct tuple_type_pack {};
-
-struct tuple_default_construct {};
+struct tuple_default_construct {
+  explicit tuple_default_construct(void) = default; 
+};
 
 // pack_expands_to_tuple
 template <typename TupleType, typename... Args>
@@ -67,18 +65,18 @@ concept pack_expands_to_tuple =
     same_as<TupleType, ext::remove_cvref_t<first_of_t<Args...>>>;
 
 template <typename T>
-concept __is_tuple = requires { typename T::__tuple_base_t; };
+concept tuple_type = requires { typename T::__tuple_base_t; };
 
 // Tuple initialization concepts
 template <typename TupleType, typename... Args>
 concept initializable_with = 
-    __is_tuple<TupleType> &&
+    tuple_type<TupleType> &&
     not pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size == sizeof...(Args);
 
 template <typename TupleType, typename... Args>
 concept partial_initializable_with = 
-    __is_tuple<TupleType> &&
+    tuple_type<TupleType> &&
     not pack_expands_to_tuple<TupleType, Args...> &&
     TupleType::size > sizeof...(Args);
 
@@ -124,7 +122,7 @@ public:
 // tuple_impl
 // https://github.com/llvm-mirror/libcxx/blob/master/include/tuple#L367
 template <typename IdxSeq, typename... Types>
-struct tuple_impl {};
+class tuple_impl {};
 
 // Actual class that inherites the leafs that hold the values,
 // so it can be static casted with base leafs.
@@ -182,7 +180,7 @@ private:
       detail::tuple_impl<detail::make_idx_seq<sizeof...(Types)>, Types...>;
   __tuple_base_t base_;
 public:
-  explicit tuple(void) : base_{} {
+  explicit constexpr tuple(void) : base_{} {
     static_assert((... && default_constructible<Types>), 
                   "At least one of the Types is not default constructible");
   }
@@ -199,7 +197,7 @@ public:
   explicit constexpr tuple(Args&&... args)
     requires detail::partial_initializable_with<tuple, Args...>
     : base_{ detail::tuple_range_t<0, n_args - 1>(), 
-             detail::tuple_range_t<n_args, n_type - 1>(),
+             detail::tuple_range_t<n_args, n_type - 1>(), 
              std::forward<Args>(args)... }
   { }
   
