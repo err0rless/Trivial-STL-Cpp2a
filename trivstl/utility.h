@@ -3,7 +3,7 @@
 
 #include "tuple.h"
 
-namespace ext {
+namespace triv {
 
 template <bool... Conditions>
 struct all {
@@ -15,6 +15,6 @@ struct one_of {
   static constexpr bool value = (... || Conditions);
 };
 
-} // namespace ext
+} // namespace triv
 
 #endif /* utility_h */

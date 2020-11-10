@@ -1,7 +1,7 @@
 #ifndef type_traits_h
 #define type_traits_h
 
-namespace ext {
+namespace triv {
 
 // unwrap_reference, unwrap_ref_decay
 // https://en.cppreference.com/w/cpp/utility/functional/unwrap_reference

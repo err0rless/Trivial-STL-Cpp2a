@@ -8,10 +8,10 @@
 #include "concepts.h"
 
 // Internal implementation
-namespace ext::__tuple_impl::detail {
+namespace triv::__tuple_impl::detail {
 
 // use concepts in header concepts.h
-using namespace ext::concepts;
+using namespace triv::concepts;
 
 // first_of
 // first_of<int, double, float, char>::type -> int
@@ -62,7 +62,7 @@ struct tuple_default_construct {
 template <typename TupleType, typename... Args>
 concept pack_expands_to_tuple = 
     sizeof...(Args) == 1 &&
-    same_as<TupleType, ext::remove_cvref_t<first_of_t<Args...>>>;
+    same_as<TupleType, triv::remove_cvref_t<first_of_t<Args...>>>;
 
 template <typename T>
 concept tuple_type = requires { typename T::__tuple_base_t; };
@@ -100,7 +100,7 @@ public:
 
   template <typename _T>
   explicit constexpr tuple_leaf(_T&& element) 
-    requires (not same_as<ext::remove_cvref_t<_T>, tuple_leaf> && 
+    requires (not same_as<triv::remove_cvref_t<_T>, tuple_leaf> && 
               not same_as<_T, detail::tuple_default_construct>)
     : data_{std::forward<_T>(element)}
   { }
@@ -148,9 +148,9 @@ public:
                                 idx_seq<DefaultIndex...>, 
                                 Args&&... args)
     requires (sizeof...(ArgsIndex) + sizeof...(DefaultIndex) == sizeof...(Types))
-    : tuple_leaf<ArgsIndex, ext::access_t<ArgsIndex, Types...>>{ 
+    : tuple_leaf<ArgsIndex, triv::access_t<ArgsIndex, Types...>>{ 
         std::forward<Args>(args) }...
-    , tuple_leaf<DefaultIndex, ext::access_t<DefaultIndex, Types...>>{ 
+    , tuple_leaf<DefaultIndex, triv::access_t<DefaultIndex, Types...>>{ 
         tuple_default_construct{} }...
   { }
   
@@ -167,9 +167,9 @@ public:
 }
 
 // Interface
-namespace ext {
+namespace triv {
 
-using namespace ext::__tuple_impl;
+using namespace triv::__tuple_impl;
 
 // tuple
 template <typename... Types>
@@ -233,21 +233,21 @@ tuple(std::pair<First, Second>) -> tuple<First, Second>;
 // get (https://github.com/llvm-mirror/libcxx/blob/master/include/tuple#L1005)
 template <std::size_t Index, typename... Types>
 inline constexpr auto &get(tuple<Types...> &Tuple) {
-  using type_at_index = ext::access_t<Index, Types...>;
+  using type_at_index = triv::access_t<Index, Types...>;
   using leaf_t = detail::tuple_leaf<Index, type_at_index>;
   return static_cast<leaf_t &>(Tuple.base_).get();
 }
 
 template <std::size_t Index, typename... Types>
 inline constexpr const auto &get(const tuple<Types...> &Tuple) {
-  using type_at_index = ext::access_t<Index, Types...>;
+  using type_at_index = triv::access_t<Index, Types...>;
   using leaf_t = detail::tuple_leaf<Index, type_at_index>;
   return static_cast<const leaf_t &>(Tuple.base_).get();
 }
 
 template <std::size_t Index, typename... Types>
 inline constexpr auto &&get(tuple<Types...> &&Tuple) {
-  using type_at_index = ext::access_t<Index, Types...>;
+  using type_at_index = triv::access_t<Index, Types...>;
   using leaf_t = detail::tuple_leaf<Index, type_at_index>;
   return static_cast<typename leaf_t::value_type &&>(
            static_cast<leaf_t &&>(Tuple.base_).get());
@@ -255,7 +255,7 @@ inline constexpr auto &&get(tuple<Types...> &&Tuple) {
 
 template <std::size_t Index, typename... Types>
 inline constexpr const auto &&get(const tuple<Types...> &&Tuple) {
-  using type_at_index = ext::access_t<Index, Types...>;
+  using type_at_index = triv::access_t<Index, Types...>;
   using leaf_t = detail::tuple_leaf<Index, type_at_index>;
   return static_cast<typename leaf_t::value_type const &&>(
            static_cast<const leaf_t &&>(Tuple.base_).get());
@@ -271,9 +271,9 @@ constexpr auto tie(Args&... args) -> tuple<Args&...> {
 // https://github.com/llvm-mirror/libcxx/blob/master/include/tuple#L1135
 template <typename... Args>
 constexpr auto make_tuple(Args&&... args) {
-  return tuple<ext::unwrap_ref_decay_t<Args>...>{ std::forward<Args>(args)... };
+  return tuple<triv::unwrap_ref_decay_t<Args>...>{ std::forward<Args>(args)... };
 }
 
-} // namespace ext
+} // namespace triv
 
 #endif /* tuple_h */

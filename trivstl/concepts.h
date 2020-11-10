@@ -3,7 +3,7 @@
 
 #include <type_traits>
 
-namespace ext {
+namespace triv {
 inline namespace concepts {
 
 // same_as
