@@ -6,10 +6,11 @@ cd build/
 CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++ cmake ../
 cmake --build .
 
-if [ ! -f main ]; then
+if [ ! -f src/main ]; then
   echo "------------------------------ [ FAILED ] ------------------------------"
   exit -1
 fi
 
 echo "------------------------------ [ RUN ] ------------------------------"
-./main
+src/main
+cd .. ; rm -rf build
