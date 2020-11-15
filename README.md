@@ -1,5 +1,5 @@
-# Trivial-library-CPP2a
-Personal and trivial implementation of C++ library
+# Trivial-STL-Cpp2a
+Trivial implementation of C++ STL written in C++2a
 
 ## Environment
 ```sh
