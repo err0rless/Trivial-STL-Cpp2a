@@ -1,5 +1,5 @@
-#ifndef _CONCEPTS_H_
-#define _CONCEPTS_H_
+#ifndef _TRIV_CONCEPTS_H_
+#define _TRIV_CONCEPTS_H_
 
 #include <type_traits>
 
@@ -17,4 +17,4 @@ concept default_constructible = std::is_default_constructible_v<T>;
 }
 }
 
-#endif
+#endif // _TRIV_CONCEPTS_H_

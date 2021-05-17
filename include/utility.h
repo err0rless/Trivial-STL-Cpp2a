@@ -1,5 +1,5 @@
-#ifndef utility_h
-#define utility_h
+#ifndef _TRIV_UTILITY_H_
+#define _TRIV_UTILITY_H_
 
 #include "tuple.h"
 
@@ -17,4 +17,4 @@ struct one_of {
 
 } // namespace triv
 
-#endif /* utility_h */
+#endif // _TRIV_UTILITY_H_

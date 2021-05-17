@@ -1,5 +1,5 @@
-#ifndef type_traits_h
-#define type_traits_h
+#ifndef _TRIV_TYPE_TRAITS_H_
+#define _TRIV_TYPE_TRAITS_H_
 
 namespace triv {
 
@@ -50,4 +50,4 @@ using access_t = typename access_type_index<Index, Types...>::type;
 
 }
 
-#endif /* type_traits_h */
+#endif // _TRIV_TYPE_TRAITS_H_

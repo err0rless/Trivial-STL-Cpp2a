@@ -1,5 +1,5 @@
-#ifndef tuple_h
-#define tuple_h
+#ifndef _TRIV_TUPLE_H_
+#define _TRIV_TUPLE_H_
 
 #include <utility>
 #include <type_traits>
@@ -276,4 +276,4 @@ constexpr auto make_tuple(Args&&... args) {
 
 } // namespace triv
 
-#endif /* tuple_h */
+#endif // _TRIV_TUPLE_H_
