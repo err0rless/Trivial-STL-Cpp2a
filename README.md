@@ -2,7 +2,7 @@
 Trivial implementation of C++ STL written in C++2a
 
 ## Environment
-MAC
+OS X
 ```sh
 ❯ brew info llvm
 llvm: stable 10.0.1 (bottled), HEAD [keg-only]
@@ -14,7 +14,7 @@ Thread model: posix
 InstalledDir: /usr/local/opt/llvm/bin
 ```
 
-BASH
+Ubuntu
 ```sh
 ➜  Trivial-STL-Cpp2a git:(main) clang --version
 clang version 12.0.0
