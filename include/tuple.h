@@ -1,58 +1,12 @@
 #ifndef _TRIV_TUPLE_H_
 #define _TRIV_TUPLE_H_
 
-#include <utility>
-#include <type_traits>
 #include "type_traits.h"
 #include "utility.h"
 #include "concepts.h"
 
 // Internal implementation
 namespace triv::__tuple_impl::detail {
-
-// use concepts in header concepts.h
-using namespace triv::concepts;
-
-// first_of
-// first_of<int, double, float, char>::type -> int
-template <typename... Args>
-struct first_of {};
-
-template <typename First, typename... Rest>
-struct first_of<First, Rest...> { using type = First; };
-
-template <typename... Args>
-using first_of_t = typename first_of<Args...>::type;
-
-template <std::size_t... Seq>
-using idx_seq = std::index_sequence<Seq...>;
-
-template <std::size_t N>
-using make_idx_seq = std::make_index_sequence<N>;
-
-// tuple_range_seq
-// tuple_range_seq<3, 6>::type -> std::index_sequence<3, 4, 5, 6>
-template <std::size_t N0, std::size_t N1>
-struct __tuple_add {
-  static constexpr std::size_t value = N0 + N1;
-};
-
-template <std::size_t N, typename Seq>
-struct __tuple_range_seq_impl {};
-
-template <std::size_t N, std::size_t... Seq>
-struct __tuple_range_seq_impl<N, idx_seq<Seq...>> {
-  using type = idx_seq<__tuple_add<N, Seq>::value...>;
-};
-
-template <std::size_t Begin, std::size_t End>
-struct tuple_range_seq {
-  using type = 
-      typename __tuple_range_seq_impl<Begin, make_idx_seq<(End - Begin) + 1>>::type;
-};
-
-template <std::size_t Begin, std::size_t End>
-using tuple_range_t = typename tuple_range_seq<Begin, End>::type;
 
 struct tuple_default_construct {
   explicit tuple_default_construct(void) = default; 
@@ -62,7 +16,7 @@ struct tuple_default_construct {
 template <typename TupleType, typename... Args>
 concept pack_expands_to_tuple = 
     sizeof...(Args) == 1 &&
-    same_as<TupleType, triv::remove_cvref_t<first_of_t<Args...>>>;
+    same_as<TupleType, triv::remove_cvref_t<triv::first_of_t<Args...>>>;
 
 template <typename T>
 concept tuple_type = requires { typename T::__tuple_base_t; };
@@ -89,12 +43,12 @@ public:
   using value_type = T;
   
   explicit constexpr tuple_leaf(void) 
-    requires (not std::is_reference_v<T> && default_constructible<T>)
+    requires (!triv::is_reference<T> && triv::default_constructible<T>)
     : data_{}
   { }
 
   explicit constexpr tuple_leaf(detail::tuple_default_construct)
-    requires (not std::is_reference_v<T> && default_constructible<T>)
+    requires (!triv::is_reference<T> && triv::default_constructible<T>)
     : data_{} 
   { }
 
@@ -144,8 +98,8 @@ public:
   template <std::size_t... ArgsIndex, 
             std::size_t... DefaultIndex,
             typename... Args>
-  explicit constexpr tuple_impl(idx_seq<ArgsIndex...>, 
-                                idx_seq<DefaultIndex...>, 
+  explicit constexpr tuple_impl(triv::idx_seq<ArgsIndex...>, 
+                                triv::idx_seq<DefaultIndex...>, 
                                 Args&&... args)
     requires (sizeof...(ArgsIndex) + sizeof...(DefaultIndex) == sizeof...(Types))
     : tuple_leaf<ArgsIndex, triv::access_t<ArgsIndex, Types...>>{ 
@@ -177,11 +131,11 @@ class tuple {
 private:
   static constexpr std::size_t size = sizeof...(Types);
   using __tuple_base_t = 
-      detail::tuple_impl<detail::make_idx_seq<sizeof...(Types)>, Types...>;
+      detail::tuple_impl<triv::make_idx_seq<sizeof...(Types)>, Types...>;
   __tuple_base_t base_;
 public:
   explicit constexpr tuple(void) 
-    requires (... && default_constructible<Types>)
+    requires (... && triv::default_constructible<Types>)
     : base_{} 
   { }
 
@@ -196,8 +150,8 @@ public:
             std::size_t n_args = sizeof...(Args)>
   explicit constexpr tuple(Args&&... args)
     requires detail::partial_initializable_with<tuple, Args...>
-    : base_{ detail::tuple_range_t<0, n_args - 1>(), 
-             detail::tuple_range_t<n_args, n_type - 1>(), 
+    : base_{ triv::range_seq_t<0, n_args - 1>(), 
+             triv::range_seq_t<n_args, n_type - 1>(), 
              std::forward<Args>(args)... }
   { }
   

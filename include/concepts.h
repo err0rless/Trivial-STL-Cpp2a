@@ -14,6 +14,9 @@ concept same_as = std::is_same_v<T, U> && std::is_same_v<U, T>;
 template <typename T>
 concept default_constructible = std::is_default_constructible_v<T>;
 
+template <typename T>
+concept is_reference = std::is_reference_v<T>;
+
 }
 }
 
