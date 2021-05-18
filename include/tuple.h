@@ -89,12 +89,12 @@ public:
   using value_type = T;
   
   explicit constexpr tuple_leaf(void) 
-    requires (not std::is_reference_v<T>)
+    requires (not std::is_reference_v<T> && default_constructible<T>)
     : data_{}
   { }
 
   explicit constexpr tuple_leaf(detail::tuple_default_construct)
-    requires (not std::is_reference_v<T>)
+    requires (not std::is_reference_v<T> && default_constructible<T>)
     : data_{} 
   { }
 
@@ -180,10 +180,10 @@ private:
       detail::tuple_impl<detail::make_idx_seq<sizeof...(Types)>, Types...>;
   __tuple_base_t base_;
 public:
-  explicit constexpr tuple(void) : base_{} {
-    static_assert((... && default_constructible<Types>), 
-                  "At least one of the Types is not default constructible");
-  }
+  explicit constexpr tuple(void) 
+    requires (... && default_constructible<Types>)
+    : base_{} 
+  { }
 
   template <typename... Args>
   explicit constexpr tuple(Args&&... args)
