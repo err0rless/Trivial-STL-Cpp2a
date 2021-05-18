@@ -102,7 +102,7 @@ public:
   explicit constexpr tuple_leaf(_T&& element) 
     requires (not same_as<triv::remove_cvref_t<_T>, tuple_leaf> && 
               not same_as<_T, detail::tuple_default_construct>)
-    : data_{std::forward<_T>(element)}
+    : data_{ static_cast<T>(std::forward<_T>(element)) }
   { }
   
   constexpr tuple_leaf(const tuple_leaf &) = default;
