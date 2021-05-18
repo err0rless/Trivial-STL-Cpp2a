@@ -17,7 +17,8 @@ template <bool... Conditions> concept Or = (... || Conditions);
 // first_of
 // first_of<int, double, float, char>::type -> int
 template <typename... Args>
-struct first_of {};
+  requires (sizeof...(Args) > 0)
+struct first_of;
 
 template <typename First, typename... Rest>
 struct first_of<First, Rest...> { using type = First; };
