@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "../include/utility.h"
 
-TEST(TrivUtility, _And)
+TEST(TrivUtility, And)
 {
     constexpr bool AndTrueExpected00 = triv::And<true, true, true>;
     constexpr bool AndTrueExpected01 = triv::And<true, true, true>;
@@ -16,7 +16,7 @@ TEST(TrivUtility, _And)
     EXPECT_FALSE(AndFalseExpected02);
 }
 
-TEST(TrivUtility, _Or)
+TEST(TrivUtility, Or)
 {
     constexpr bool OrTrueExpected00 = triv::Or<false, false, false, true>;
     constexpr bool OrTrueExpected01 = triv::Or<true, false, true, false, true>;

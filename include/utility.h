@@ -3,11 +3,8 @@
 
 namespace triv {
 
-template <bool... Conditions>
-concept And = (... && Conditions);
-
-template <bool... Conditions>
-concept Or = (... || Conditions);
+template <bool... Conditions> concept And = (... && Conditions);
+template <bool... Conditions> concept Or = (... || Conditions);
 
 } // namespace triv
 
