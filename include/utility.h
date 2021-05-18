@@ -25,6 +25,25 @@ struct first_of<First, Rest...> { using type = First; };
 template <typename... Args>
 using first_of_t = typename first_of<Args...>::type;
 
+// index_of
+// index_of<2, char, short, int, double> -> int
+template <std::size_t Idx, typename... Args>
+  requires (Idx >= 0 && Idx < sizeof...(Args))
+struct index_of;
+
+template <std::size_t Idx, typename T, typename... Rest>
+struct index_of<Idx, T, Rest...> {
+  using type = typename index_of<Idx - 1, Rest...>::type;
+};
+
+template <typename T, typename... Rest>
+struct index_of<0, T, Rest...> {
+  using type = T;
+};
+
+template <std::size_t Idx, typename... Args>
+using index_of_t = typename index_of<Idx, Args...>::type;
+
 // tuple_range_seq
 // tuple_range_seq<3, 6>::type -> std::index_sequence<3, 4, 5, 6>
 template <std::size_t N0, std::size_t N1>

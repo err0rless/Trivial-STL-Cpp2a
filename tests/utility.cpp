@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
 #include "../include/utility.h"
 
+#include <type_traits>
+
 TEST(TrivUtility, And)
 {
     constexpr bool AndTrueExpected00 = triv::And<true, true, true>;
@@ -29,4 +31,21 @@ TEST(TrivUtility, Or)
     EXPECT_FALSE(OrFalseExpected00);
     EXPECT_FALSE(OrFalseExpected01);
     EXPECT_FALSE(OrFalseExpected02);
+}
+
+TEST(TrivUtility, GetIndex)
+{
+    using FirstOfType00 = triv::first_of_t<int, char, short>;
+    using FirstOfType01 = triv::first_of_t<double, char, short>;
+    constexpr bool FirstOfTrueExpected00 = std::is_same_v<FirstOfType00, int>;
+    constexpr bool FirstOfTrueExpected01 = std::is_same_v<FirstOfType01, double>;
+    EXPECT_TRUE(FirstOfTrueExpected00);
+    EXPECT_TRUE(FirstOfTrueExpected01);
+
+    using IndexOfType00 = triv::index_of_t<0, volatile int, char, short>;
+    using IndexOfType01 = triv::index_of_t<2, int, char, const short>;
+    constexpr bool IndexOfTrueExpected00 = std::is_same_v<IndexOfType00, volatile int>;
+    constexpr bool IndexOfTrueExpected01 = std::is_same_v<IndexOfType01, const short>;
+    EXPECT_TRUE(IndexOfTrueExpected00);
+    EXPECT_TRUE(IndexOfTrueExpected01);
 }
