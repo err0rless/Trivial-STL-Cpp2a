@@ -45,8 +45,8 @@ struct index_of<0, T, Rest...> {
 template <std::size_t Idx, typename... Args>
 using index_of_t = typename index_of<Idx, Args...>::type;
 
-// tuple_range_seq
-// tuple_range_seq<3, 6>::type -> std::index_sequence<3, 4, 5, 6>
+// range_seq
+// range_seq_t<3, 6> -> std::index_sequence<3, 4, 5, 6>
 template <std::size_t N0, std::size_t N1>
 struct add { static constexpr std::size_t value = N0 + N1; };
 
