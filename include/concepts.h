@@ -17,6 +17,9 @@ concept default_constructible = std::is_default_constructible_v<T>;
 template <typename T>
 concept is_reference = std::is_reference_v<T>;
 
+template <typename T>
+concept is_void = std::is_void_v<T>;
+
 }
 }
 
