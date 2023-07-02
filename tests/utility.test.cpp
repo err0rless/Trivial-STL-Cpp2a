@@ -3,8 +3,9 @@
 
 #include <type_traits>
 
-TEST(TrivUtility, And)
-{
+TEST(triv, utility) {}
+
+TEST(triv, __utility_And) {
     constexpr bool AndTrueExpected00 = triv::And<true, true, true>;
     constexpr bool AndTrueExpected01 = triv::And<true, true, true>;
     EXPECT_TRUE(AndTrueExpected00);
@@ -18,8 +19,7 @@ TEST(TrivUtility, And)
     EXPECT_FALSE(AndFalseExpected02);
 }
 
-TEST(TrivUtility, Or)
-{
+TEST(triv, __utility_Or) {
     constexpr bool OrTrueExpected00 = triv::Or<false, false, false, true>;
     constexpr bool OrTrueExpected01 = triv::Or<true, false, true, false, true>;
     EXPECT_TRUE(OrTrueExpected00);
@@ -33,8 +33,7 @@ TEST(TrivUtility, Or)
     EXPECT_FALSE(OrFalseExpected02);
 }
 
-TEST(TrivUtility, GetIndex)
-{
+TEST(triv, __utility_indexing) {
     using FirstOfType00 = triv::first_of_t<int, char, short>;
     using FirstOfType01 = triv::first_of_t<double, char, short>;
     constexpr bool FirstOfTrueExpected00 = std::is_same_v<FirstOfType00, int>;

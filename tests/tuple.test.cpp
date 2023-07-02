@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "../include/tuple.h"
 
-TEST(TrivTuple, TupleGeneralUse)
+TEST(triv, tuple)
 {
     triv::tuple<int, double> tuple00{ 100, 100.5 };
     EXPECT_EQ(triv::get<0>(tuple00), 100);
@@ -15,7 +15,7 @@ TEST(TrivTuple, TupleGeneralUse)
     EXPECT_EQ(triv::get<1>(tuple00) / 2, 100.5f / 2);
 }
 
-TEST(TrivTuple, TupleDefaultConstruct)
+TEST(triv, __tuple_default_constructor)
 {
     constexpr int DEFAULT_CONSTRUCT_VALUE = 0x7777 * -1;
 
