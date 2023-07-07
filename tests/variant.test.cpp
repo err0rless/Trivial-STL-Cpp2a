@@ -8,6 +8,8 @@ using namespace triv;
 using namespace triv::__detail;
 
 TEST(triv, variant) {
+    static_assert(!__contains<int, short, float&, short, const char>, "");
+    static_assert(__contains<int, short, float&, int, short, const char>, "");
     static_assert(__exact_match_idx<int, int, short, float&, short, const char> == 0, "");
     static_assert(__exact_match_idx<int*, short, int, short, const char, int*> == 4, "");
     

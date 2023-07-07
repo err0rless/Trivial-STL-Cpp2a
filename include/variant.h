@@ -2,6 +2,7 @@
 #define _TRIV_STL_VARIANT_H_
 
 #include <exception>
+#include <iostream>
 
 // References
 // - https://github.com/llvm/llvm-project/blob/main/libcxx/include/variant
@@ -12,7 +13,12 @@ namespace triv {
 
 namespace __detail {
 
-template <typename T, typename... Ts> requires (sizeof...(Ts) > 0)
+template <typename T, typename... Ts> 
+  requires (sizeof...(Ts) > 0)
+constexpr bool __contains = (std::is_same_v<T, Ts> || ...);
+
+template <typename T, typename... Ts> 
+  requires (__contains<T, Ts...>)
 constexpr size_t __num_matches = (std::is_same_v<T, Ts> + ...);
 
 // there's only one match
@@ -21,9 +27,9 @@ concept __unambiguous_match = (__num_matches<T, Ts...> == 1);
 
 // find the index of first occurrence of `T` in `Ts`
 template <typename T, typename... Ts>
-  requires (sizeof...(Ts) > 0)
+  requires (__contains<T, Ts...>)
 consteval int __index_of(void) {
-  constexpr bool __matches[] = {std::is_same_v<T, Ts>...};
+  constexpr bool __matches[] = { std::is_same_v<T, Ts>..., };
   for (int i = 0; i < sizeof...(Ts); ++i) {
     if (__matches[i]) {
       return i;
