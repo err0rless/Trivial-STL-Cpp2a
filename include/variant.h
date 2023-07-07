@@ -19,27 +19,23 @@ constexpr size_t __num_matches = (std::is_same_v<T, Ts> + ...);
 template <typename T, typename... Ts>
 concept __unambiguous_match = (__num_matches<T, Ts...> == 1);
 
-template <size_t I, typename T, typename... Ts>
-struct __index_of_impl;
-
-template <size_t I, typename T, typename U, typename... Ts>
-struct __index_of_impl<I, T, U, Ts...> {
-  static constexpr int value = 
-    std::is_same_v<T, U> ? I : __index_of_impl<I + 1, T, Ts...>::value;
-};
-
-template <size_t I, typename T, typename U>
-struct __index_of_impl<I, T, U> {
-  static constexpr int value = std::is_same_v<T, U> ? I : -1;
-};
-
+// find the index of first occurrence of `T` in `Ts`
 template <typename T, typename... Ts>
-constexpr auto __index_of_v = __index_of_impl<0, T, Ts...>::value;
+  requires (sizeof...(Ts) > 0)
+consteval int __index_of(void) {
+  constexpr bool __matches[] = {std::is_same_v<T, Ts>...};
+  for (int i = 0; i < sizeof...(Ts); ++i) {
+    if (__matches[i]) {
+      return i;
+    }
+  }
+  return -1;
+}
 
 // Find unambiguous match for `T` from the parameter pack `Ts` 
 template <typename T, typename... Ts>
   requires (__unambiguous_match<T, Ts...>)
-constexpr auto __exact_match_idx = __index_of_v<T, Ts...>;
+constexpr auto __exact_match_idx = __index_of<T, Ts...>();
 
 }
 
